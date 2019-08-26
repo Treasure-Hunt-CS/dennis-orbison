@@ -25,7 +25,7 @@ const move = (direction, guess = false) => {
   const token = "Token 2e289710723b27949296f5ad3152027ecb6061f1";
   let data = { direction };
   if (guess) {
-    data = { direction, next_room_id: guess };
+    data = { direction, next_room_id: String(guess) };
   }
   return axios({
     method: "post",
@@ -45,6 +45,18 @@ const move = (direction, guess = false) => {
     });
 };
 
+const reverse = direction => {
+  if (direction === "n") {
+    return "s";
+  } else if (direction === "s") {
+    return "n";
+  } else if (direction === "w") {
+    return "e";
+  } else if (direction === "e") {
+    return "w";
+  }
+};
+
 const travel = async (direction, prevRoom_id, guess = false) => {
   // first get room id
   console.log("guess", guess);
@@ -53,11 +65,11 @@ const travel = async (direction, prevRoom_id, guess = false) => {
 
     if (!direction) {
       room_data = await getInit();
-      // } else if (guess) {
-      //   room_data = await move(direction, guess);
-      //   visited_rooms[prevRoom_id]["exits"][direction] = room_data["room_id"];
-      //   console.log("call move, with direction", direction);
-      //   console.log(visited_rooms);
+    } else if (guess) {
+      room_data = await move(direction, guess);
+      visited_rooms[prevRoom_id]["exits"][direction] = room_data["room_id"];
+      console.log("call move, with direction", direction);
+      console.log(visited_rooms);
     } else {
       let data = JSON.stringify(visited_rooms);
       fs.writeFileSync("data.json", data);
@@ -88,27 +100,51 @@ const travel = async (direction, prevRoom_id, guess = false) => {
         title,
         description
       };
+
+      visited_rooms[current_room]["exits"][reverse(direction)] = prevRoom_id;
+    }
+
+    let moved = false;
+    if (exits.length === 1 && visited_rooms[current_room]["exits"][exits[0]]) {
+      console.log("room has one exit should go back");
+      console.log(
+        time,
+        exits[0],
+        visited_rooms[current_room]["exits"][exits[0]]
+      );
+      //   return;
+      setTimeout(
+        () =>
+          travel(
+            exits[0],
+            current_room,
+            visited_rooms[current_room]["exits"][exits[0]]
+          ),
+        time
+      );
+      moved = true;
     }
 
     let min = null;
-    let moved = false;
-    for (e in visited_rooms[current_room]["exits"]) {
-      if (visited_rooms[current_room]["exits"][e] == false) {
-        console.log("moving to here", e);
-        moved = true;
-        setTimeout(() => travel(e, current_room), time);
-        break;
-      } else {
-        if (min == null || visited_rooms[current_room]["exits"][e] < min) {
-          //   console.log(visited_rooms[current_room]["exits"][e], e);
-          min = visited_rooms[current_room]["exits"][e];
-          //   console.log(
-          //     min,
-          //     current_room,
-          //     visited_rooms[current_room][e],
-          //     visited_rooms[current_room],
-          //     e
-          //   );
+    if (!moved) {
+      for (e in visited_rooms[current_room]["exits"]) {
+        if (visited_rooms[current_room]["exits"][e] == false) {
+          console.log("moving to here", e);
+          moved = true;
+          setTimeout(() => travel(e, current_room), time);
+          break;
+        } else {
+          if (min == null || visited_rooms[current_room]["exits"][e] < min) {
+            //   console.log(visited_rooms[current_room]["exits"][e], e);
+            min = visited_rooms[current_room]["exits"][e];
+            //   console.log(
+            //     min,
+            //     current_room,
+            //     visited_rooms[current_room][e],
+            //     visited_rooms[current_room],
+            //     e
+            //   );
+          }
         }
       }
     }
@@ -117,7 +153,16 @@ const travel = async (direction, prevRoom_id, guess = false) => {
       console.log("will move to room with smallest id", min);
       for (e in visited_rooms[current_room]["exits"]) {
         if (visited_rooms[current_room]["exits"][e] == min) {
-          setTimeout(() => travel(e, current_room, min), time);
+          console.log("direction", e);
+          setTimeout(
+            () =>
+              travel(
+                e,
+                current_room,
+                visited_rooms[current_room]["exits"][exits[e]]
+              ),
+            time
+          );
         }
       }
     }

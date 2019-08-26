@@ -83,7 +83,7 @@ const submitProof = (req, res) => {
   const player_id = playerList[minerPointer++];
   minerPointer = minerPointer % playerList.length;
   const token = "Token " + player_id;
-  res.status(200).json({ player_id: token });
+  //   res.status(200).json({ player_id: token });
   axios({
     method: "POST",
     headers: {
