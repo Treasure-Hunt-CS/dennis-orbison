@@ -239,6 +239,9 @@ class Miner ():
             print("last proof", self.last_proof)
             print("current proof", self.proof)
 
+            # set up function to check if last proof as been changed
+            # if it has reset miner
+
     def instance_of_Proof(self, proof, multiplier=0, proof_string=""):
         proof = multiplier + proof
         return self.valid_proof(proof, proof_string)
@@ -331,7 +334,7 @@ miner2 = Miner(last_proof=10, difficulty=6, multiplier=14)
 # miner2.mine()
 # miner2.get_last_proof()
 # miner2.get_miner_id()
-miner2.submit_proof(1234)
+# miner2.submit_proof(1234)
 
 # t = Thread(target=miner.mine)
 # t2 = Thread(target=miner2.mine)
@@ -518,3 +521,84 @@ miner2.submit_proof(1234)
 # new proof:  146634723 proof string:  ਗ਼먾 last proof:  10 difficulty:  7 time to mine:  411.0049846172333 size of pre-mind:  1
 # {7: {10: 146634723}}
 # press enter to continue
+
+
+# visited_rooms = {}
+# ------------------------------------------
+# visited_rooms[0] = { n:false, e:false, w:false, s:false }
+
+# check for rooms not visited
+#  - some roomes not visited
+#  - record previous room = 0
+#  - go east
+
+# get room id = 4
+# update previous room id exits
+#  - visited_rooms[0] = {exit: {n:false, e:4, w:false, s:false}, title: ""}
+
+# get exits = [w]
+# update the direction we came from w = 0
+# visited_rooms[4] = {exit: {w:0}, is_buyer: true}
+# ----------------------------------------
+# check for rooms not visited
+#  - all rooms visited
+#  - go towards the room with smallest id
+#  - or go to previous room w
+# ----------------------------------------
+# check for rooms not visited
+#  - some rooms not visited
+#  - record previous room = 0
+#  - go west
+
+#  get room id = 3
+#  update previous room id exits
+#  - visited_rooms[0] = {n:false, e:4, w:3, s:false}
+
+#  get exits = [n, e, s]
+#  update the direction we came from e = 0
+#  visited_rooms[3] = {n:false, e:0, s:false}
+# -------------------------------------------
+# check for rooms not visited
+#  - some rooms not visited
+#  - record previous room = 3
+#  - go south
+
+#  get room id = 7
+#  update previous room id exits
+#  - visited_rooms[3] = {n:false, e:0, s:7}
+
+#  get exits = [n, e, s]
+#  update the direction we came from s = 3
+#  visited_rooms[7] = {n:3}
+# ----------------------------------------
+# check for rooms not visited
+#  - all rooms visited
+#  - go towards the room with smallest id
+#  - or go to previous room n
+# ----------------------------------------
+# check for rooms not visited
+#  - some rooms not visited
+#  - record previous room = 3
+#  - go north
+
+#  get room id = 8
+#  update previous room id exits
+#  - visited_rooms[3] = {n:8, e:0, s:7}
+
+
+#  get exits = [n, s]
+#  update the direction we came from s = 3
+#  visited_rooms[8] = {n:false, s:3}
+#  ----------------------------------------
+# check for rooms not visited
+#  - some rooms not visited
+#  - record previous room = 8
+#  - go north
+
+#  get room id = 13
+#  update previous room id exits
+#  - visited_rooms[8] = {n:13, s:3}
+
+#  get exits = [e, w, s]
+#  update the direction we came from s = 8
+#  visited_rooms[13] = {e:false, w:false, s:8}
