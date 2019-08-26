@@ -2,7 +2,7 @@ const axios = require("axios");
 const fs = require("fs");
 
 const getInit = () => {
-  token = "Token 2e289710723b27949296f5ad3152027ecb6061f1";
+  token = "Token dda434406f687265418a0e63333a042355b1fbfd";
 
   return axios({
     method: "get",
@@ -22,7 +22,7 @@ const getInit = () => {
 };
 
 const move = (direction, guess = false) => {
-  const token = "Token 2e289710723b27949296f5ad3152027ecb6061f1";
+  const token = "Token dda434406f687265418a0e63333a042355b1fbfd";
   let data = { direction };
   if (guess) {
     data = { direction, next_room_id: guess };
@@ -85,8 +85,8 @@ const travel = async (direction, prevRoom_id, guess = false) => {
       visited_rooms[current_room] = {
         exits: roomExits,
         items,
-        title,
-        description
+        title
+        // description
       };
     }
 
