@@ -133,7 +133,7 @@ const travel = async (direction, prevRoom_id, guess = false) => {
           moved = true;
           setTimeout(() => travel(e, current_room), time);
           break;
-        } else if (min == null || visited_rooms[current_room]["exits"][e] < min) {
+        } else if (min == null || visited_rooms[current_room]["exits"][e] < min || min == false) {
             //   console.log(visited_rooms[current_room]["exits"][e], e);
             min = visited_rooms[current_room]["exits"][e];
             //   console.log(
