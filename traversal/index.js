@@ -100,8 +100,9 @@ const travel = async (direction, prevRoom_id, guess = false) => {
         title,
         description
       };
-
-      visited_rooms[current_room]["exits"][reverse(direction)] = prevRoom_id;
+      if (prevRoom_id) {
+        visited_rooms[current_room]["exits"][reverse(direction)] = prevRoom_id;
+      }
     }
 
     let moved = false;
@@ -125,7 +126,7 @@ const travel = async (direction, prevRoom_id, guess = false) => {
       moved = true;
     }
 
-    let min = null;
+    let min = Infinity;
     if (!moved) {
       for (e in visited_rooms[current_room]["exits"]) {
         if (visited_rooms[current_room]["exits"][e] == false) {
@@ -133,17 +134,39 @@ const travel = async (direction, prevRoom_id, guess = false) => {
           moved = true;
           setTimeout(() => travel(e, current_room), time);
           break;
-        } else {
-          if (min == null || visited_rooms[current_room]["exits"][e] < min) {
-            //   console.log(visited_rooms[current_room]["exits"][e], e);
+          // } else if (
+          //   min == null ||
+          //   visited_rooms[current_room]["exits"][e] < min
+          // ) {
+          //   //   console.log(visited_rooms[current_room]["exits"][e], e);
+          //   console.log(
+          //     "min is",
+          //     visited_rooms[current_room]["exits"][e],
+          //     "prev min is ",
+          //     min
+          //   );
+          //   min = visited_rooms[current_room]["exits"][e];
+          //   //   console.log(
+          //   //     min,
+          //   //     current_room,
+          //   //     visited_rooms[current_room][e],
+          //   //     visited_rooms[current_room],
+          //   //     e
+          //   //   );
+          // }
+        }
+      }
+
+      if (!moved) {
+        for (e in visited_rooms[current_room]["exits"]) {
+          if (min > visited_rooms[current_room]["exits"][e]) {
+            console.log(
+              "min is",
+              visited_rooms[current_room]["exits"][e],
+              "prev min is ",
+              min
+            );
             min = visited_rooms[current_room]["exits"][e];
-            //   console.log(
-            //     min,
-            //     current_room,
-            //     visited_rooms[current_room][e],
-            //     visited_rooms[current_room],
-            //     e
-            //   );
           }
         }
       }
@@ -154,15 +177,8 @@ const travel = async (direction, prevRoom_id, guess = false) => {
       for (e in visited_rooms[current_room]["exits"]) {
         if (visited_rooms[current_room]["exits"][e] == min) {
           console.log("direction", e);
-          setTimeout(
-            () =>
-              travel(
-                e,
-                current_room,
-                visited_rooms[current_room]["exits"][exits[e]]
-              ),
-            time
-          );
+          setTimeout(() => travel(e, current_room, min), time);
+          break;
         }
       }
     }
