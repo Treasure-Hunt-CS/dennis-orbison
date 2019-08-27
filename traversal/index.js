@@ -160,19 +160,6 @@ const travel = async (direction, prevRoom_id, guess = false) => {
       if (!moved) {
         for (e in visited_rooms[current_room]["exits"]) {
           if (min > visited_rooms[current_room]["exits"][e]) {
-            if ( current_room.room_id == 0) {
-              let go = Math.floor(Math.random() * 4);
-              console.log( 'RANDOM' , go )
-              if ( go == 0 ) {
-                move( 'n' )
-              } else if ( go == 1 ) {
-                move( 's' )
-              } else if ( go == 2 ) {
-                move( 'e' )
-              } else if ( go == 3 ) {
-                move( 'w' )
-              }
-            }
             console.log(
               "min is",
               visited_rooms[current_room]["exits"][e],
