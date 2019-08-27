@@ -129,7 +129,7 @@ const travel = async (direction, prevRoom_id, guess = false) => {
     let min = Infinity;
     if (!moved) {
       for (e in visited_rooms[current_room]["exits"]) {
-        if (visited_rooms[current_room]["exits"][e] == false) {
+        if (visited_rooms[current_room]["exits"][e] === false) {
           console.log("moving to here", e);
           moved = true;
           setTimeout(() => travel(e, current_room), time);
