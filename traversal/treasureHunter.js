@@ -1,7 +1,7 @@
 const axios = require("axios");
 const fs = require("fs");
 
-const getInit = () => {
+const getInit = ( shop , items ) => {
 
     token = "Token dda434406f687265418a0e63333a042355b1fbfd";
 
@@ -20,8 +20,23 @@ const getInit = () => {
         .then(results => {
 
             let x = results.data.room_id
+
             console.log( x )
-            readMap( x , results.data.cooldown )
+            if ( shop == true ) {
+
+                // console.log( 'going to shop' , items )
+                if ( x == 1 ) {
+                    sellTreasure( items , results.data.cooldown )
+                } else {
+                    readMap( x , results.data.cooldown , shop )
+                }
+
+            } else {
+
+                console.log( 'no need to shop' )
+                readMap( x , results.data.cooldown , shop )
+
+            }
             return results.data;
         })
 
@@ -50,13 +65,23 @@ const getInv = () => {
         .then(results => {
 
             let x = results.data
-            console.log( x )
+            let items = results.data.inventory
+
+            // console.log( x )
             if ( x.inventory.length == 0  ) {
-                // setTimeout( () => (getInit()) , 1000 )
+
+                shop = false
+                console.log( 'no shop' )
+                setTimeout( () => ( getInit( shop = false , items )) , 1000 )
+
             } else if ( x.inventory.length <= 5 ) {
-                // bfs( current_room , 1 ,  )
-                console.log( 'get money' )
+
+                shop = true
+                console.log( 'going to the shop' )
+                setTimeout( () => ( getInit( shop = true , items )) , 1000 )
+
             }
+
             return results.data;
         })
 
@@ -128,24 +153,94 @@ const move = async ( path , cooldown ) => {
     
         let step = path[i][1]
         let direction = { direction: step , next_room_id: path[ i ][0].toString() }
+
         // let direction = { direction: step }
         // console.log( path )
         // console.log( direction )
+
         console.log( 'cd' , cooldown )
         await timeout( cooldown * 1000 )
         console.log( 'ping' )
         await axios
-            .post( 'https://lambda-treasure-hunt.herokuapp.com/api/adv/move/' , direction , { headers: { Authorization: `Token dda434406f687265418a0e63333a042355b1fbfd` }} )
-            .then( res => {
-                console.log( 'room id:' , res.data.room_id )
-                console.log( 'after axios' , res.data.cooldown )
-                cooldown = res.data.cooldown
-            })
-            .catch( err => (
-                console.log( 'ERROR IN MOVE' , err.message )
-                ))
+        .post( 'https://lambda-treasure-hunt.herokuapp.com/api/adv/move/' , direction , { headers: { Authorization: `Token dda434406f687265418a0e63333a042355b1fbfd` }} )
+        .then( res => {
+            console.log( 'room id:' , res.data.room_id )
+            console.log( 'after axios:' , res.data.cooldown )
+            items = res.data.items
+            cooldown = res.data.cooldown
+            if ( items.length >= 1 ) {
+
+                console.log( items , items.length )
+                i = path.length
+                collectTreasure( items , cooldown )
+                
             }
+
+
+        })
+        .catch( err => (
+            console.log( 'ERROR IN MOVE' , err.message )
+            ))
+        }
             // await timeout( cooldown )
+}
+
+const collectTreasure = async ( items , cooldown ) => {
+
+    console.log( `collecting ${ items }` )
+    
+    for ( i = 0; i < items.length; i++ ) {
+
+        treasure = { name: items[i] }
+        console.log( treasure )
+
+        await timeout( cooldown * 1000 )
+        await axios
+        .post( 'https://lambda-treasure-hunt.herokuapp.com/api/adv/take/' , treasure , { headers: { Authorization: `Token dda434406f687265418a0e63333a042355b1fbfd` }} )
+        .then( res => {
+            console.log( res.data )
+            console.log( `collected 1 ${items[i]}` )
+            cooldown = res.data.cooldown
+            
+        })
+        .catch( err => {
+            console.log( 'ERROR IN COLLECT TREASURE' , err.message )
+        })
+    
+    }
+
+    setTimeout( () => getInv() , 5000 )
+         
+}
+
+const sellTreasure = async ( items , cooldown ) => {
+
+    console.log( 'selling treasure' , items )
+    
+    for ( i = 0; i < items.length ; i++ ) {
+
+        treasure = { name: items[i] , confirm: 'yes' }
+        console.log( treasure )
+
+        await timeout( cooldown * 3000 )
+        await axios
+            .post( 'https://lambda-treasure-hunt.herokuapp.com/api/adv/sell/' , treasure , { headers: { Authorization: `Token dda434406f687265418a0e63333a042355b1fbfd` }} )
+            .then( res => {
+                console.log( res.data )
+                console.log( `collected 1 ${item}` )
+                cooldown = res.data.cooldown
+                
+            })
+            .catch( err => {
+                console.log( 'ERROR IN SELL TREASURE' , err.message )
+            })
+    
+    }
+
+    setTimeout( () => getInv() , 5000 )
+    console.log( 'done' )
+         
+
 }
 
 function timeout(ms) {
@@ -194,12 +289,23 @@ const readMap = (init_room , cooldown) => {
         // console.log( treasure_room[0].room )
 
         let current_room = init_room
-        var destination_room = 467
-        bfs( current_room , destination_room , data , cooldown )
+
+        x = Math.floor(Math.random() * 498)
+        if ( shop == false ) {
+
+            destination_room =  Object.keys( data )[x] 
+            console.log( `Going to room ${destination_room}` )
+            bfs( current_room , destination_room , data , cooldown )
+
+        } else if ( shop == true ) {
+
+            destination_room = 1
+            bfs( current_room , destination_room , data , cooldown )
+
+        }
 
     })
 
 }
 
-getInit()
 getInv()
