@@ -6,7 +6,7 @@ let base_url = "https://lambda-treasure-hunt.herokuapp.com/api/bc/";
 
 let headers = {
   "Content-Type": "application/json",
-  Authorization: "Token a01402b735cf167aada6e0971168135236e21079"
+  Authorization: "Token a01402b735cf167aada6e0971168135236e21079x"
 };
 
 function timeout(ms) {
@@ -51,7 +51,7 @@ function valid_proof(last_proof, proof) {
 
 function mine_proof(found_proof) {
   return axios
-    .post(`${base_url}/mine/`, { proof: [found_proof] })
+    .post(`${base_url}/mine/`, { proof: found_proof })
     .then(res => {
       res_message = res;
 

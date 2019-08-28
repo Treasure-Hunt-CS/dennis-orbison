@@ -312,7 +312,7 @@ const travel = async (id, direction, prevRoom_id, guess = false) => {
 
 let visited_rooms = {};
 
-let id = "Token 2e289710723b27949296f5ad3152027ecb6061f1";
+let id = "Token a01402b735cf167aada6e0971168135236e21079";
 setTimeout(() => travel(id), 2653);
 // let id = "Token ";
 // setTimeout(() => travel(id), 2653);

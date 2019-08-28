@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const playerList = ["2e289710723b27949296f5ad3152027ecb6061f1"];
+const playerList = ["a01402b735cf167aada6e0971168135236e21079"];
 const miner_id_list = [];
 let playerPointer = 0;
 let minerPointer = 0;
