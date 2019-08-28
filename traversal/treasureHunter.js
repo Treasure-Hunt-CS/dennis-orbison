@@ -182,7 +182,7 @@ const move = async ( path , cooldown ) => {
             ))
         }
     console.log( 'move done' )
-    setTimeout( () => getInv() , 2000 )
+    setTimeout( () => getInv() , 20000 )
 
 }
 
