@@ -180,6 +180,7 @@ const move = async ( path , cooldown ) => {
         .catch( err => (
             console.log( 'ERROR IN MOVE (ignore)' )
             ))
+            i = path.length
         }
     console.log( 'move done' )
     setTimeout( () => getInv() , 20000 )
