@@ -6,7 +6,7 @@ let base_url = "https://lambda-treasure-hunt.herokuapp.com/api/bc/";
 
 let headers = {
   "Content-Type": "application/json",
-  Authorization: "Token a01402b735cf167aada6e0971168135236e21079"
+  Authorization: "Token 2e289710723b27949296f5ad3152027ecb6061f1"
 };
 
 function timeout(ms) {
@@ -14,10 +14,17 @@ function timeout(ms) {
 }
 
 function get_last_proof() {
-  return axios
-    .get(`${base_url}/last_proof/`, (headers = headers))
+  return axios({
+    method: "GET",
+    headers: {
+      "content-type": "application/json",
+      Authorization: "Token 2e289710723b27949296f5ad3152027ecb6061f1"
+    },
+    url: "https://lambda-treasure-hunt.herokuapp.com/api/bc/last_proof/"
+  })
     .then(res => {
-      last_proof = res;
+      console.log(res.data);
+      last_proof = res.data;
 
       return last_proof;
     })
@@ -35,6 +42,7 @@ function proof_of_work(last_proof) {
 }
 
 function valid_proof(last_proof, proof) {
+  if (proof % 1000000 == 0 && proof != 0) console.log(proof);
   let str = `${last_proof.proof}${proof}`;
   let guess = utf8.encode(str);
 
@@ -67,20 +75,19 @@ async function miner() {
   while (true) {
     let last_proof = await get_last_proof();
     console.log("Start mining the proof ");
-    // let found_proof = res.json()['proof']
-    // TODO
-    console.log("Start cooldown ", last_proof.cooldown * 1000);
-    await timeout(last_proof.cooldown * 1000);
+    // console.log("Start cooldown ", last_proof.cooldown * 1000);
+    // await timeout(last_proof.cooldown * 1000);
 
     // Create a new proof from the found proof
     let found_proof = await proof_of_work(last_proof);
-    console.log("Finished mining the proof");
-    console.log("FOUND PROOF IS", found_proof);
-    //TODO add headers with new proof
-    let mine_response = await mine_proof(found_proof);
-    console.log("MINE RES IS ", mine_response);
-    //TODO check if we need it
-    await timeout(mine_response.cooldown * 1000);
+    console.log(found_proof);
+    // console.log("Finished mining the proof");
+    // console.log("FOUND PROOF IS", found_proof);
+    // //TODO add headers with new proof
+    // let mine_response = await mine_proof(found_proof);
+    // console.log("MINE RES IS ", mine_response);
+    // //TODO check if we need it
+    // await timeout(mine_response.cooldown * 1000);
     // TODO Finish the if statement based on mine resonse
     // if (mine_response.json()['messages'] == '?'){
     //     coins_mined += 1;
@@ -89,3 +96,6 @@ async function miner() {
   }
 }
 miner();
+
+// 2e289710723b27949296f5ad3152027ecb6061f1
+// a01402b735cf167aada6e0971168135236e21079
