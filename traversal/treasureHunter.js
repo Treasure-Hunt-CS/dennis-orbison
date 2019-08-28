@@ -1,6 +1,8 @@
 const axios = require("axios");
 const fs = require("fs");
 
+
+
 const getInit = ( shop , items ) => {
 
     token = "Token dda434406f687265418a0e63333a042355b1fbfd";
@@ -177,11 +179,15 @@ const move = async ( path , cooldown ) => {
 
 
         })
-        .catch( err => (
-            console.log( 'ERROR IN MOVE (ignore)' )
-            ))
-            i = path.length
-        }
+        .catch( err => {
+            if ( err ) {
+                console.log( 'ERROR IN MOVE (ignore)' )
+                i = path.length
+            } else { 
+                console.log( 'ERROR IN MOVE (ignore)' )
+            }
+        })
+    }
     console.log( 'move done' )
     setTimeout( () => getInv() , 20000 )
 
