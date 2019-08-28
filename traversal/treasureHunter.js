@@ -158,14 +158,13 @@ const move = async ( path , cooldown ) => {
         // console.log( path )
         // console.log( direction )
 
-        console.log( 'cd' , cooldown )
+        console.log( 'cooldown:' , cooldown )
         await timeout( cooldown * 1000 )
-        console.log( 'ping' )
         await axios
         .post( 'https://lambda-treasure-hunt.herokuapp.com/api/adv/move/' , direction , { headers: { Authorization: `Token dda434406f687265418a0e63333a042355b1fbfd` }} )
         .then( res => {
             console.log( 'room id:' , res.data.room_id )
-            console.log( 'after axios:' , res.data.cooldown )
+            // console.log( 'after axios:' , res.data.cooldown )
             items = res.data.items
             cooldown = res.data.cooldown
             if ( items.length >= 1 ) {
@@ -173,16 +172,18 @@ const move = async ( path , cooldown ) => {
                 console.log( items , items.length )
                 i = path.length
                 collectTreasure( items , cooldown )
-                
+
             }
 
 
         })
         .catch( err => (
-            console.log( 'ERROR IN MOVE' , err.message )
+            console.log( 'ERROR IN MOVE (ignore)' )
             ))
         }
-            // await timeout( cooldown )
+    console.log( 'move done' )
+    setTimeout( () => getInv() , 2000 )
+
 }
 
 const collectTreasure = async ( items , cooldown ) => {
@@ -204,12 +205,12 @@ const collectTreasure = async ( items , cooldown ) => {
             
         })
         .catch( err => {
-            console.log( 'ERROR IN COLLECT TREASURE' , err.message )
+            console.log( 'ERROR IN COLLECT TREASURE (ignore)' , err.message )
         })
     
     }
 
-    setTimeout( () => getInv() , 5000 )
+    setTimeout( () => getInv() , 20000 )
          
 }
 
