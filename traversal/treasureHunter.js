@@ -18,23 +18,57 @@ const getInit = () => {
     })
 
         .then(results => {
-            // console.log(results.data);
+
             let x = results.data.room_id
-            readMap(x)
+            console.log( x )
+            readMap( x , results.data.cooldown )
             return results.data;
         })
 
         .catch(err => {
             console.log(err);
         });
-        
+
 };
 
-const bfs = (starting_room, destination_room , data) => {
+const getInv = () => {
+
+    token = "Token dda434406f687265418a0e63333a042355b1fbfd";
+
+    return axios({
+
+        method: "post",
+        headers: {
+            "content-type": "application/json",
+            Authorization: token
+        },
+
+        url: "https://lambda-treasure-hunt.herokuapp.com/api/adv/status/"
+
+    })
+
+        .then(results => {
+
+            let x = results.data
+            console.log( x )
+            if ( x.inventory.length == 0  ) {
+                // setTimeout( () => (getInit()) , 1000 )
+            } else if ( x.inventory.length <= 5 ) {
+                // bfs( current_room , 1 ,  )
+                console.log( 'get money' )
+            }
+            return results.data;
+        })
+
+        .catch(err => {
+            console.log(err);
+        });
+
+};
+
+const bfs = (starting_room, destination_room , data , cooldown) => {
 
     visited_rooms = data
-
-    console.log( data[ 0 ].exits )
 
     if (starting_room === destination_room) {
 
@@ -45,14 +79,14 @@ const bfs = (starting_room, destination_room , data) => {
     visited = {};
     visited_path = {};
     queue = [];
-    queue.unshift([starting_room]);
+    queue.unshift([[starting_room , 'start']]);
 
     while (queue.length > 0) {
         
         path = queue.shift();
         last = path.length - 1;
-        room = path[last];
-
+        room = path[last][0];
+        // console.log( path )
         if (!(room in visited)) {
 
             for ( neighbor in visited_rooms[ room ].exits ) {
@@ -61,16 +95,16 @@ const bfs = (starting_room, destination_room , data) => {
 
                     path_new = [...path];
                     
-                    path_new.push(visited_rooms[ room ].exits[neighbor]);
-                    console.log( visited_rooms[ room ].exits , neighbor  , room)
+                    path_new.push([ visited_rooms[ room ].exits[neighbor] , neighbor ]);
                     
                     queue.unshift(path_new);
                     
                     if ( visited_rooms[ room ].exits[neighbor] == destination_room) {
-                        // path_new.pop();
+                        
                         last = path_new.length - 1;
-                        console.log( path_new )
-                        return visited_path[path_new[last]] = path_new;
+                        // console.log( path_new )
+                        move( path_new , cooldown )
+                        return visited_path[path_new[last][0]] = path_new;
 
                     }
                 }
@@ -80,12 +114,47 @@ const bfs = (starting_room, destination_room , data) => {
         }
     }
 
-    console.log(visited_path);
+    // console.log(visited_path);
+    // setTimeout( () => (getInv()) , 1000 )
+
     return visited_path;
 
 };
 
-const readMap = (init_room) => {
+
+const move = async ( path , cooldown ) => {
+
+    for ( i = 1; i < path.length; i++ ) {
+    
+        let step = path[i][1]
+        let direction = { direction: step , next_room_id: path[ i ][0].toString() }
+        // let direction = { direction: step }
+        // console.log( path )
+        // console.log( direction )
+        console.log( 'cd' , cooldown )
+        await timeout( cooldown * 1000 )
+        console.log( 'ping' )
+        await axios
+            .post( 'https://lambda-treasure-hunt.herokuapp.com/api/adv/move/' , direction , { headers: { Authorization: `Token dda434406f687265418a0e63333a042355b1fbfd` }} )
+            .then( res => {
+                console.log( 'room id:' , res.data.room_id )
+                console.log( 'after axios' , res.data.cooldown )
+                cooldown = res.data.cooldown
+            })
+            .catch( err => (
+                console.log( 'ERROR IN MOVE' , err.message )
+                ))
+            }
+            // await timeout( cooldown )
+}
+
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+const readMap = (init_room , cooldown) => {
 
     fs.readFile('data.json', (err, info) => {
 
@@ -125,11 +194,12 @@ const readMap = (init_room) => {
         // console.log( treasure_room[0].room )
 
         let current_room = init_room
-        var destination_room = treasure_room[0].room
-        bfs( current_room , destination_room , data )
+        var destination_room = 467
+        bfs( current_room , destination_room , data , cooldown )
 
     })
 
 }
 
 getInit()
+getInv()
